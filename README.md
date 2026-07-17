@@ -37,20 +37,17 @@
 ## 环境要求
 
 - Python >= 3.12
-- conda 环境 `inte`
 - Claude Code
 
 ## 安装
 
 ```bash
-# 1. 激活环境
-conda activate inte
+# 1. 创建并激活虚拟环境（conda / venv 均可）
+python -m venv .venv && source .venv/bin/activate
 
 # 2. 安装 MCP Server（开发模式，改源码自动生效）
 cd src/mcp-server
 pip install -e ".[dev]"
-
-# 3. 配置 Claude Code
 ```
 
 ### 配置 MCP Server
@@ -61,7 +58,7 @@ pip install -e ".[dev]"
 {
   "mcpServers": {
     "investigation-graph": {
-      "command": "/home/luke/miniconda3/envs/inte/bin/python",
+      "command": "python",
       "args": ["-m", "investigation_graph"],
       "cwd": "${workspaceFolder}/src/mcp-server"
     }
@@ -69,11 +66,22 @@ pip install -e ".[dev]"
 }
 ```
 
+> 如果使用 conda 或其他虚拟环境，将 `command` 替换为对应 Python 解释器的绝对路径。
+>
 > 旧配置使用 `-m server` 仍可启动（`server.py` 为兼容 shim），但建议迁移到 `-m investigation_graph`。
 
 ### 配置 Skill
 
-将 Skill 目录链接到 Claude Code 的全局 skills 路径：
+将 Skill 目录链接到 Claude Code 的 skills 路径（项目级或全局均可）：
+
+项目级（推荐，放在工作区 `.claude/skills/`）：
+
+```bash
+ln -s /path/to/intelligence-graph/src/skills/investigation \
+      <工作区>/.claude/skills/investigation
+```
+
+全局：
 
 ```bash
 ln -s /path/to/intelligence-graph/src/skills/investigation \
@@ -88,7 +96,8 @@ ln -s /path/to/intelligence-graph/src/skills/investigation \
 
 ```bash
 cd src/mcp-server
-conda run -n inte pytest -q
+pip install -e ".[dev]"
+pytest -q
 ```
 
 ## 当前能力边界
